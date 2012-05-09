@@ -4,6 +4,7 @@ package main
 
 import (
     "flag"
+    "fmt"
     "log"
     "net/http"
     "text/template"
@@ -16,6 +17,7 @@ var templ = template.Must(template.New("qr").Parse(templateStr))
 func main() {
     flag.Parse()
     http.Handle("/", http.HandlerFunc(QR))
+    fmt.Println("Server listening at 1718 port")
     err := http.ListenAndServe(*addr, nil)
     if err != nil {
         log.Fatal("ListenAndServe:", err)
@@ -23,6 +25,7 @@ func main() {
 }
 
 func QR(w http.ResponseWriter, req *http.Request) {
+    log.Printf("Request:", req)
     templ.Execute(w, req.FormValue("s"))
 }
 

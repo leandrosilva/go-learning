@@ -13,8 +13,8 @@ var helloHtmlTemplate = template.Must(template.New("n").Parse(helloHtmlTemplateS
 
 func main() {
 	router := mux.NewRouter()
-	router.HandleFunc("/", HomeHandler)
-	router.HandleFunc("/hello/{name}", HelloHandler)
+	router.HandleFunc("/", homeHandler)
+	router.HandleFunc("/hello/{name}", helloHandler)
 
 	fmt.Println("Hellomux server listening at 8080")
 
@@ -24,14 +24,14 @@ func main() {
 	}
 }
 
-func HomeHandler(res http.ResponseWriter, req *http.Request) {
-	log.Println("[HomeHandler] Request:", req)
+func homeHandler(res http.ResponseWriter, req *http.Request) {
+	log.Println("[homeHandler] Request:", req)
 
 	homeHtmlTemplate.Execute(res, nil)
 }
 
-func HelloHandler(res http.ResponseWriter, req *http.Request) {
-	log.Println("[HelloHandler] Request:", req)
+func helloHandler(res http.ResponseWriter, req *http.Request) {
+	log.Println("[helloHandler] Request:", req)
 
 	params := mux.Vars(req)
 	name := params["name"]

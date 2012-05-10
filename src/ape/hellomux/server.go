@@ -1,42 +1,42 @@
 package main
 
 import (
-  "fmt"
-  "log"
-  "net/http"
-  "text/template"
-  "code.google.com/p/gorilla/mux"
+	"code.google.com/p/gorilla/mux"
+	"fmt"
+	"log"
+	"net/http"
+	"text/template"
 )
 
 var homeHtmlTemplate = template.Must(template.New("").Parse(homeHtmlTemplateStr))
 var helloHtmlTemplate = template.Must(template.New("n").Parse(helloHtmlTemplateStr))
 
 func main() {
-  router := mux.NewRouter()
-  router.HandleFunc("/", HomeHandler)
-  router.HandleFunc("/hello/{name}", HelloHandler)
-  
-  fmt.Println("Hellomux server listening at 8080")
-  
-  err := http.ListenAndServe(":8080", router)
-  if err != nil {
-      log.Fatal("ListenAndServe:", err)
-  }
+	router := mux.NewRouter()
+	router.HandleFunc("/", HomeHandler)
+	router.HandleFunc("/hello/{name}", HelloHandler)
+
+	fmt.Println("Hellomux server listening at 8080")
+
+	err := http.ListenAndServe(":8080", router)
+	if err != nil {
+		log.Fatal("ListenAndServe:", err)
+	}
 }
 
 func HomeHandler(res http.ResponseWriter, req *http.Request) {
-  log.Println("[HomeHandler] Request:", req)
+	log.Println("[HomeHandler] Request:", req)
 
-  homeHtmlTemplate.Execute(res, nil)
+	homeHtmlTemplate.Execute(res, nil)
 }
 
 func HelloHandler(res http.ResponseWriter, req *http.Request) {
-  log.Println("[HelloHandler] Request:", req)
-  
-  params := mux.Vars(req)
-  name := params["name"]
+	log.Println("[HelloHandler] Request:", req)
 
-  helloHtmlTemplate.Execute(res, name)
+	params := mux.Vars(req)
+	name := params["name"]
+
+	helloHtmlTemplate.Execute(res, name)
 }
 
 const homeHtmlTemplateStr = `

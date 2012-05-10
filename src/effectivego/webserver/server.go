@@ -3,11 +3,11 @@
 package main
 
 import (
-    "flag"
-    "fmt"
-    "log"
-    "net/http"
-    "text/template"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"text/template"
 )
 
 var addr = flag.String("addr", ":1718", "http service address") // Q=17, R=18
@@ -15,18 +15,18 @@ var addr = flag.String("addr", ":1718", "http service address") // Q=17, R=18
 var templ = template.Must(template.New("qr").Parse(templateStr))
 
 func main() {
-    flag.Parse()
-    http.Handle("/", http.HandlerFunc(QR))
-    fmt.Println("Server listening at 1718 port")
-    err := http.ListenAndServe(*addr, nil)
-    if err != nil {
-        log.Fatal("ListenAndServe:", err)
-    }
+	flag.Parse()
+	http.Handle("/", http.HandlerFunc(QR))
+	fmt.Println("Server listening at 1718 port")
+	err := http.ListenAndServe(*addr, nil)
+	if err != nil {
+		log.Fatal("ListenAndServe:", err)
+	}
 }
 
 func QR(w http.ResponseWriter, req *http.Request) {
-    log.Printf("Request:", req)
-    templ.Execute(w, req.FormValue("s"))
+	log.Printf("Request:", req)
+	templ.Execute(w, req.FormValue("s"))
 }
 
 const templateStr = `

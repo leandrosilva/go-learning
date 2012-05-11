@@ -56,10 +56,6 @@ func newClient() *godis.Client {
 	return godis.New("", 0, "")
 }
 
-func newPipeClient() *godis.PipeClient {
-	return godis.NewPipeClient("", 0, "")
-}
-
 func key(uuid string) string {
 	return "DISLOCK:LOCK:" + uuid
 }
@@ -67,35 +63,24 @@ func key(uuid string) string {
 func tryAcquire(uuid string, client string) bool {
 	var acquired = false
 
-	var redis = newPipeClient()
+	var redis = newClient()
 	var key = key(uuid)
 
-	redis.Watch(key)
-
 	// what about this lock?
-	redis.Get(key)
-	var replyGet = redis.Exec()[0].Elem.String()
+	var value, _ = redis.Get(key)
 
-	if replyGet != "" {
-		if replyGet == client {
-			// already has the lock
-			acquired = true
-		} else {
-			// other client has the lock
-			acquired = false
-		}
+	if value.String() == "" {
+		// nobody has the lock, so try to acquire it
+		acquired, _ = redis.Setnx(key, client)
 	} else {
-		// try to acquire the lock
-		redis.Set(key, client)
-		var replySet = redis.Exec()[0].Elem.String()
-
-		if replySet == "OK" {
-			// it was successful to acquire the lock
-			acquired = true
-		}
+  	if value.String() == client {
+  		// already has the lock
+  		acquired = true
+  	} else {
+  		// other client has the lock
+  		acquired = false
+  	}
 	}
-
-	redis.Unwatch()
 
 	return acquired
 }

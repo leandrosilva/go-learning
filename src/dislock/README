@@ -1,0 +1,3 @@
+:: Dislock ::
+
+This is a very simple implementation of distributed lock on top of Redis.

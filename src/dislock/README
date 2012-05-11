@@ -1,3 +1,40 @@
 :: Dislock ::
 
 This is a very simple implementation of distributed lock on top of Redis.
+
+It is just for fun.  :)
+
+---
+
+HOW TO TEST
+
+1. Build this cake:
+
+  $ git clone https://github.com/leandrosilva/go-learning
+  $ cd go-learning/src/dislock/lock
+  $ go install
+  $ cd ../nuclear-test
+  $ go install
+  $ cd ../../../bin/    # "go-learning/bin"
+
+2. Fire a Redis server:
+
+  $ redis-server
+
+3. Open one terminal and fire a nuclear-test:
+
+  $ ./nuclear-test -u nuclear_blah -c mr_burns
+  
+4. Open other terminal and fire a nuclear-test:
+
+  $ ./nuclear-test -u nuclear_blah -c homer_simpson
+
+5. On terminal one, press <RETURN> key
+
+6. Take a look at terminal two
+
+7. Back to terminal one and try the step 3
+
+---
+
+If you find some bug, please let me know.

@@ -2,6 +2,7 @@ package lock
 
 import (
 	"github.com/simonz05/godis"
+	"time"
 )
 
 type Lock struct {
@@ -33,6 +34,9 @@ func (l *Lock) Acquire() bool {
 			l.Acquired = true
 			break
 		}
+
+		// wait a moment and try again
+		time.Sleep(1 * 1e9)
 	}
 
 	return l.Acquired
@@ -61,6 +65,8 @@ func key(uuid string) string {
 }
 
 func tryAcquire(uuid string, client string) bool {
+	var acquired = false
+
 	var redis = newPipeClient()
 	var key = key(uuid)
 
@@ -73,10 +79,10 @@ func tryAcquire(uuid string, client string) bool {
 	if replyGet != "" {
 		if replyGet == client {
 			// already has the lock
-			return true
+			acquired = true
 		} else {
 			// other client has the lock
-			return false
+			acquired = false
 		}
 	} else {
 		// try to acquire the lock
@@ -85,13 +91,13 @@ func tryAcquire(uuid string, client string) bool {
 
 		if replySet == "OK" {
 			// it was successful to acquire the lock
-			return true
+			acquired = true
 		}
 	}
 
 	redis.Unwatch()
 
-	return false
+	return acquired
 }
 
 func release(uuid string, client string) {

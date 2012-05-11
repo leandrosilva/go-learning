@@ -67,11 +67,6 @@ func TestTryAcquire_Fail(t *testing.T) {
 }
 
 func TestAcquire(t *testing.T) {
-	// Sometimes this test breaks because, I don't know exactly why, connection to Redis is lost
-	// Maybe it is a time out but the error message is not too clear about that
-	// If try it using, for example, a redis-cli instead of simulate with goroutine, it works
-	// So I need to figure out how to automate this test in a better way
-
 	reset()
 
 	var uuid = "nuclear_read"

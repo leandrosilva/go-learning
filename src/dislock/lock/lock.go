@@ -64,7 +64,7 @@ func tryAcquire(uuid string, client string) bool {
 	var redis = newPipeClient()
 	var key = key(uuid)
 
-  redis.Watch(key)
+	redis.Watch(key)
 
 	// what about this lock?
 	redis.Multi()
@@ -81,7 +81,7 @@ func tryAcquire(uuid string, client string) bool {
 		}
 	} else {
 		// try to acquire the lock
-  	redis.Multi()
+		redis.Multi()
 		redis.Set(key, client)
 		var replySet = redis.Exec()[0].Elem.String()
 
@@ -90,7 +90,7 @@ func tryAcquire(uuid string, client string) bool {
 			return true
 		}
 	}
-	
+
 	redis.Unwatch()
 
 	return false

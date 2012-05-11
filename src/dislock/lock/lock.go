@@ -23,6 +23,21 @@ func (l *Lock) TryAcquire() bool {
 	return l.Acquired
 }
 
+func (l *Lock) Acquire() bool {
+	if l.Acquired {
+		return true
+	}
+
+	for {
+		if acquired := tryAcquire(l.UUID, l.Client); acquired {
+			l.Acquired = true
+			break
+		}
+	}
+
+	return l.Acquired
+}
+
 func (l *Lock) Release() {
 	if !l.Acquired {
 		return
@@ -49,9 +64,10 @@ func tryAcquire(uuid string, client string) bool {
 	var redis = newPipeClient()
 	var key = key(uuid)
 
-	redis.Watch(key)
+  redis.Watch(key)
 
 	// what about this lock?
+	redis.Multi()
 	redis.Get(key)
 	var replyGet = redis.Exec()[0].Elem.String()
 
@@ -65,6 +81,7 @@ func tryAcquire(uuid string, client string) bool {
 		}
 	} else {
 		// try to acquire the lock
+  	redis.Multi()
 		redis.Set(key, client)
 		var replySet = redis.Exec()[0].Elem.String()
 
@@ -73,6 +90,8 @@ func tryAcquire(uuid string, client string) bool {
 			return true
 		}
 	}
+	
+	redis.Unwatch()
 
 	return false
 }

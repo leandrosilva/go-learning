@@ -3,6 +3,7 @@ package lock
 import (
 	"github.com/simonz05/godis"
 	"testing"
+	"time"
 )
 
 // WARNING: This test suite requires Redis is up and runnig
@@ -65,6 +66,38 @@ func TestTryAcquire_Fail(t *testing.T) {
 	}
 }
 
+func TestAcquire(t *testing.T) {
+  // Sometimes this test breaks because, I don't know exactly way, connection to Redis is lost
+  // Maybe it is a time out but the error message is not too clear about that
+  
+	reset()
+
+	var uuid = "nuclear_read"
+	var l = New(uuid, "mr_burns")
+
+	if sucess := l.TryAcquire(); !sucess {
+		t.Errorf("lock.TryAcquire() = %v, want = %v", sucess, true)
+	}
+
+	if !l.Acquired {
+		t.Errorf("lock.Acquired = %v, want = %v", l.Acquired, true)
+	}
+
+	go waitAndReleaseLock(l)
+
+	var l2 = New(uuid, "homer_simpson")
+
+	if sucess := l2.Acquire(); !sucess {
+		t.Errorf("lock.Acquire() = %v, want = %v", sucess, true)
+	}
+
+	if !l2.Acquired {
+		t.Errorf("lock.Acquired = %v, want = %v", l2.Acquired, true)
+	}
+
+	time.Sleep(2 * 1e9)
+}
+
 func TestRelease(t *testing.T) {
 	reset()
 
@@ -84,4 +117,9 @@ func TestRelease(t *testing.T) {
 	if l.Acquired {
 		t.Errorf("lock.Acquired = %v, want = %v", l.Acquired, false)
 	}
+}
+
+func waitAndReleaseLock(l *Lock) {
+	time.Sleep(1 * 1e9)
+	l.Release()
 }

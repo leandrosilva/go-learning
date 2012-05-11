@@ -66,20 +66,17 @@ func tryAcquire(uuid string, client string) bool {
 	var redis = newClient()
 	var key = key(uuid)
 
-	// what about this lock?
-	var value, _ = redis.Get(key)
-
-	if value.String() == "" {
-		// nobody has the lock, so try to acquire it
+	if value, _ := redis.Get(key); value.String() == "" {
+		// nobody has this lock, so try to acquire it
 		acquired, _ = redis.Setnx(key, client)
 	} else {
-  	if value.String() == client {
-  		// already has the lock
-  		acquired = true
-  	} else {
-  		// other client has the lock
-  		acquired = false
-  	}
+		if value.String() == client {
+			// already has the lock
+			acquired = true
+		} else {
+			// other client has the lock
+			acquired = false
+		}
 	}
 
 	return acquired

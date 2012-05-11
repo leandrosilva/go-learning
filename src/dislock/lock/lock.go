@@ -86,5 +86,7 @@ func release(uuid string, client string) {
 	var redis = newClient()
 	var key = key(uuid)
 
-	redis.Del(key)
+	if value, _ := redis.Get(key); value.String() == client {
+		redis.Del(key)
+	}
 }

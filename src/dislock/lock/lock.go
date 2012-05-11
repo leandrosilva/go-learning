@@ -67,7 +67,6 @@ func tryAcquire(uuid string, client string) bool {
 	redis.Watch(key)
 
 	// what about this lock?
-	redis.Multi()
 	redis.Get(key)
 	var replyGet = redis.Exec()[0].Elem.String()
 
@@ -81,7 +80,6 @@ func tryAcquire(uuid string, client string) bool {
 		}
 	} else {
 		// try to acquire the lock
-		redis.Multi()
 		redis.Set(key, client)
 		var replySet = redis.Exec()[0].Elem.String()
 

@@ -24,12 +24,16 @@ func (l *Lock) TryAcquire() bool {
 	return l.Acquired
 }
 
-func (l *Lock) Acquire() bool {
+func (l *Lock) Acquire(attempts int) bool {
+  if attempts < 1 {
+    return false
+  }
+  
 	if l.Acquired {
 		return true
 	}
-
-	for {
+	
+	for i := 0; i < attempts; i++ {
 		if acquired := tryAcquire(l.UUID, l.Client); acquired {
 			l.Acquired = true
 			break

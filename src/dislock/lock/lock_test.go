@@ -66,7 +66,7 @@ func TestTryAcquire_Fail(t *testing.T) {
 	}
 }
 
-func TestAcquire(t *testing.T) {
+func TestAcquire_Sucess(t *testing.T) {
 	reset()
 
 	var uuid = "nuclear_read"
@@ -84,12 +84,41 @@ func TestAcquire(t *testing.T) {
 
 	var l2 = New(uuid, "homer_simpson")
 
-	if sucess := l2.Acquire(); !sucess {
+	if sucess := l2.Acquire(3); !sucess {
 		t.Errorf("lock.Acquire() = %v, want = %v", sucess, true)
 	}
 
 	if !l2.Acquired {
 		t.Errorf("lock.Acquired = %v, want = %v", l2.Acquired, true)
+	}
+
+	time.Sleep(2 * 1e9)
+}
+
+func TestAcquire_Fail(t *testing.T) {
+	reset()
+
+	var uuid = "nuclear_read"
+	var l = New(uuid, "mr_burns")
+
+	if sucess := l.TryAcquire(); !sucess {
+		t.Errorf("lock.TryAcquire() = %v, want = %v", sucess, true)
+	}
+
+	if !l.Acquired {
+		t.Errorf("lock.Acquired = %v, want = %v", l.Acquired, true)
+	}
+
+	go waitAndReleaseLock(l)
+
+	var l2 = New(uuid, "homer_simpson")
+
+	if sucess := l2.Acquire(1); sucess {
+		t.Errorf("lock.Acquire() = %v, want = %v", sucess, false)
+	}
+
+	if l2.Acquired {
+		t.Errorf("lock.Acquired = %v, want = %v", l2.Acquired, false)
 	}
 
 	time.Sleep(2 * 1e9)
